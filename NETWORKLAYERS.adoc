@@ -1,4 +1,4 @@
-include::NAV.adoc[]
+link:README.adoc[Overview] | link:NETWORKLAYERS.adoc[Network Layers]
 
 ## Network Layers
 ### Table of Contents
