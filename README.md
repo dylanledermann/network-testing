@@ -1,6 +1,107 @@
-[Overview](README.md) | [Network Layers](NETWORKLAYERS.md)
+# File Explorer
 
-## Overview
+This repo is used to store different network tests to determine where conection problems occur.
 
-This repo is used to store different network tests.
-In this, I go through testing layer by layer to identify where a connection fails.
+## Table of Contents
+ - [General Info](#general-info)
+ - [1. Physical Layer](#layer-1-physical-layer)
+ - [2. Data Link Layer](#layer-2-data-link-layer)
+ - [3. Network Layer](#layer-3-network-layer)
+ - [4. Transport Layer](#layer-4-transport-layer)
+ - [5. Session Layer](#layer-5-session-layer)
+ - [6. Presentation Layer](#layer-6-presentation-layer)
+ - [7. Application Layer](#layer-7-application-layer)
+
+## General Info
+![OSI Model](https://asmed.com/wp-content/uploads/2016/03/OSI-Model-3-29-17-website.jpg)
+
+The Open Systems Interconnection(OSI) model is a theoretical model for how the internet works. The actual model for how the internet works is the TCP/IP model. This model combines layers 1, 2 into the Network Access Layer and layers 5, 6, 7 into the Application Layer.
+
+![TCP/IP Model](https://media.geeksforgeeks.org/wp-content/uploads/20230417045622/OSI-vs-TCP-vs-Hybrid-2.webp)
+
+## Layer 1: Physical Layer
+### Definition
+This layer defines the physical or electrical connection:
+ - physical transmission medium (copper or fiber optic cable, radio frequency, etc.)
+ - transmission mode (simplex, duplex, etc.)
+ - network topology (bus, mesh, ring, etc.)
+ - transmission (digital or analog)
+
+The protocol data unit (PDU) for this layer is bits and this layer does the encoding to bits before sending messages.
+### Examples
+Examples of this layer are the physical layers of the following (Wireless, Coax, Fiber):
+ - Ethernet
+ - Wi-Fi
+ - Bluetooth
+
+## Layer 2: Data Link Layer
+### Definition
+The data link layer provides node to node data transfer. This layer possibly detects and corrects errors in the physical layer, such as loss or corrupt frames. The Data Link Layer is split into two layers:
+ - Media Access Control(MAC) layer: The MAC layer is responsible for controlling how devices gain access to the physical layer and permissions to transmit. The
+ - Logical Link Control(LLC) layer: The LLC layer is responsible for network layer protocols and encapsulating them and error checking/frame synchronization.
+
+The PDU for this layer is Frames.
+### Examples
+Examples of this layer are the following (These operate in both layers on different levels):
+ - Ethernet
+ - Wi-Fi
+ - Bluetooth
+
+## Layer 3: Network Layer
+### Definition
+The network layer provides variable length data sequences messaging between nodes on the same network.
+This layer translates logical network addresses into the physical machine address. 
+Message sending can use intermediate nodes if necessary.
+The network layer is responsible for splitting messages that are too long into fragments before sending the message to the data link layer. Fragments are sent independent from each other and reassembled at other nodes. The network layer does not always indicate delivery errors. The PDU for the network layer is Packets.
+### Examples
+Examples of protocols in this layer:
+ - IP
+ - ICMP
+ - ARP
+
+## Layer 4: Transport Layer
+### Definition
+The transport layer provides the means of transporting variable length sequences via one or more networks. The PDU for the transport layer is segments. This layer is responsible for segmentation, desegmentation, error control, and reliability. Some protocols ensure reliability and some do not. This layer is also responsible for converting data from the application layer to packets.
+### Examples
+Examples of transport layer protocols:
+ - User Datagram Protocol (UDP)
+ - Transmission Control Protocol (TCP)
+
+## Layer 5: Session Layer
+### Definition
+The session layer is responsible for establishing and closing connections between computers. 
+This layer provides the following:
+ - Simplex and duplex operation
+ - Checkpointing and restarting procedures
+ - Graceful shutdowns
+
+This layer is usually implemented explicitly in applications that use remote procedure calls (RPC).
+The PDU is data, which is a generic to represent compress, encrypted, etc. information being sent.
+### Examples
+Examples of session layer protocols:
+ - RPC, gRPC
+ - APIs
+ - SOCK (Sockets)
+
+## Layer 6: Presentation Layer
+### Definition
+The presentation layer, sometimes called the syntax layer, is responsible for data compression, readability, encryption, etc. 
+This layer ensures that data being sent is secure and data being received is readable.
+### Examples
+Examples of presentation layer protocols:
+ - Secure Socket Layer (SSL)
+ - Transport Layer Security (TLS)
+
+## Layer 7: Application Layer
+### Definition
+The application layer is the layer the user directly interacts with.
+Everything in this layer is application-specific.
+This layer is responsible for the following:
+ - Identifying communication partners
+ - Determining resource availability
+ - Synchronizing communication
+### Examples
+Examples of application layer protocols:
+ - HyperText Transfer Protocol/Secure (HTTP/HTTPS)
+ - File Transfer Protocol (FTP)
+ - Domain Name System (DNS)
