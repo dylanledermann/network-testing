@@ -1,3 +1,5 @@
+include::NAV.adoc[]
+
 ## Network Layers
 ### Table of Contents
  - [General Info](#general-info)
