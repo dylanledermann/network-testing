@@ -1,3 +1,4 @@
 # Network Testing
+link::NETWORKLAYERS.adoc[Network Layers]
 This repo is used to store different network tests.
 In this, I go through testing layer by layer to identify where a connection fails.
