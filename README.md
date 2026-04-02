@@ -1,4 +1,4 @@
-link:README.adoc[Overview] | link:NETWORKLAYERS.adoc[Network Layers]
+[Overview](README.md) | [Network Layers](NETWORKLAYERS.md)
 
 ## Overview
 
