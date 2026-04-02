@@ -3,6 +3,7 @@
 This repo is used to store different network tests to determine where conection problems occur.
 
 ## Table of Contents
+ - [Testing Connectivity](#testing-connectivity)
  - [General Info](#general-info)
  - [1. Physical Layer](#layer-1-physical-layer)
  - [2. Data Link Layer](#layer-2-data-link-layer)
@@ -11,6 +12,153 @@ This repo is used to store different network tests to determine where conection 
  - [5. Session Layer](#layer-5-session-layer)
  - [6. Presentation Layer](#layer-6-presentation-layer)
  - [7. Application Layer](#layer-7-application-layer)
+
+## Testing Connectivity
+This guide follows TCP/IP model, since that is the actual model used.
+Nmap can be downloaded used to see discoverable networks in the network and transport layers.
+WireShark can be downloaded and used to detect incoming and outgoing requests which can debug by checking protocol messages (ARP, TCP, etc).
+### Jump To
+ - [Network Access Layer](#network-access-layer)
+ - [Network Layer](#network-layer)
+ - [Transportation Layer](#transport-layer)
+ - [Application Layer](#application-layer)
+### Network Access Layer:
+Ensure wires are plugged in, hardware is turned on and you are connected to the internet.
+```bash
+# This checks to make sure you are connected
+# Windows
+ipconfig
+# Mac
+ifconfig
+# Linux (specify with eth0, wlan0, etc.)
+ip link show
+```
+Make sure device can communicate with local devices and has MAC/physical address.
+```bash
+# Make sure you have physical address
+arp -a
+# Ping default gateway to make sure it is accessible
+# Default gateway should be first internet address
+# Can also be found with ipconfig and maybe the layer 1 tests
+# Windows
+ping <default_gateway_ip>
+# Mac
+ping -c 4 <default_gateway_ip>
+# Linux
+ping -c 4 <default_gateway_ip>
+```
+
+### Network Layer:
+#### Ensure you have IP-based communication:
+```bash
+# Windows
+ping <destination_ip>
+# Mac
+ping -c 4 <destination_ip>
+# Linux
+ping -c 4 <destination_ip>
+```
+Check where the packet dies:
+```bash
+# Windows
+tracert <destination_ip>
+# Mac
+traceroute <destination_ip>
+# Linux
+traceroute <destination_ip>
+```
+#### Verify routing table exists
+```bash
+# Windows
+route print
+# Mac
+netstat -rn
+# Linux
+ip route
+```
+#### Large Package Test
+Failure indicates maximum transmission unit (MTU) mismatch.
+If failure, try reducing size to determine the limit.
+
+1472 = 1500 bytes (standard size) - 28 bytes (IP/ICMP header)
+
+Common issues:
+ - VPN/tunnels overhead
+ - Point to Point Protocol over Ethernet (PPPoE) requires lower MTU
+ - Misconfigured network devices
+```bash
+# Windows
+ping -f -l 1472 <destination_ip>
+# Mac
+ping -D -s 1472 <destination_ip>
+# Linux
+ping -M do -s 1472 <destination_ip>
+```
+
+### Transport Layer:
+#### Verify End-to-End using TCP/UDP ports:
+```bash
+# Windows (PowerShell)
+Test-NetConnection -ComputerName <destination_ip> -Port <port>
+# Mac - (Netcat)
+# TCP
+nc -zv <destination_ip/hostname> <port>
+# UDP
+nc -zvu <destination_ip/hostname> <port>
+# Linux - (Netcat)
+# TCP
+nc -zv <destination_ip/hostname> <port>
+# UDP
+nc -zvu <destination_ip/hostname> <port>
+```
+With tcptraceroute/tracetcp (Require download)
+```bash
+# Windows
+tracetcp <destination_ip/hostname>:<port>
+# Mac
+tcptraceroute <destination_ip/hostname> <port>
+# Linux
+tcptraceroute <destination_ip/hostname> <port>
+```
+#### Trouble Receiving Messages
+If there is trouble receiving messages, you can check port usage.
+```bash
+# Windows
+netstat -ano | findstr :<port>
+# Mac and Linux
+netstat -tuln | grep :<port>
+# Linux (Socket check)
+ss -tuln sport = :<port>
+```
+
+### Application Layer
+To test application layer, test software that runs at the application level:
+#### Port Specific Testing
+To test specific ports, transport layers can be used as well as:
+```bash
+telnet <destination_ip/hostname> <port>
+```
+#### HTTP/HTTPS Testing
+```bash
+# Windows Specific
+Invoke-WebRequest -Uri <url> -Verbose
+# Windows, Mac, Linux
+curl -v <url>
+```
+#### TSL/SSL
+```bash
+# Mac and Linux, can be downloaded for Windows
+openssl s_client -connect <destination_ip/hostname>:<port>
+```
+#### DNS
+```bash
+# Windows, Mac, Linux
+nslookup <destination_ip/hostname>
+```
+#### SSH
+```bash
+ssh -v <destination_ip/hostname>
+```
 
 ## General Info
 ![OSI Model](https://asmed.com/wp-content/uploads/2016/03/OSI-Model-3-29-17-website.jpg)
