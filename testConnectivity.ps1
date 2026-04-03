@@ -14,7 +14,7 @@
 #     a. Take input to determine which app protocol (HTTP/HTTPS, TSL/SSL, DNS, SSH).
 #     b. Run corresponding application to destination to test whether it is accessible.
 
-[CmdletBinding()]
+[CmdletBinding(PositionalBinding=$false)]
 param (
     [string]$Destination="google.com",
     [ValidateRange(0, 65535)]
