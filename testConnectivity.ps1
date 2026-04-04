@@ -48,7 +48,7 @@ function Test-Network-Access-Layer{
     # Test arp table contains Default Gateway and it isnt "ff-ff-ff-ff-ff-ff" (default value)
     $Arp_Output = arp -a | findstr($Default_Gateway)
     if (
-        -not ($Arp_Output -match "([A-Za-z\d]{2}-){5}[A-Za-z\d]") -or 
+        -not ($Arp_Output -match "([A-Za-z\d]{2}-){5}[A-Za-z\d]{2}") -or 
         $Arp_Output -match "(?i)ff-ff-ff-ff-ff-ff"
     ) {
         throw "Error in Network Access Layer: Invalid/Missing Default Gateway MAC Address in ARP table."
