@@ -119,8 +119,8 @@ function Get-URI {
         [string]$Address
     )
 
-    if (Is_IP ${Destination}) {
-        return ${Destination}
+    if (Is_IP ${Address}) {
+        return ${Address}
     }
     return "${Prefix}://${Destination}"
 }
