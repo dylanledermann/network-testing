@@ -92,9 +92,9 @@ function Test-Network-Layer {
     # Test large packet ping
     $Large_Ping_Output = ping -f -l 1472 ${Destination}
     if (-not ($Ping_Output -match "Reply from ")) {
-        echo "Warning in Network Layer: Large file message failed."
         echo "Tracing Route"
         tracert ${Destination} | echo
+        echo "Warning in Network Layer: Large file message failed."
         return
     }
     echo "Network Layer Test Successful."
