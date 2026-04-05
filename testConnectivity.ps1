@@ -132,7 +132,7 @@ function Test-Application-Layer {
         switch($Protocol) {
             "HTTP" {
                 $Uri = Get-URI "http" ${Destination}
-                $Response = Invoke-WebRequest -Uri ${Destination}
+                $Response = Invoke-WebRequest -Uri ${Uri}
                 $Status_Code = $Response.StatusCode
                 if (-not ($Status_Code.ToString() -match "2\d\d")) {
                     $Status_Description = $Response.StatusDescription
@@ -141,7 +141,7 @@ function Test-Application-Layer {
             }
             "HTTPS" {
                 $Uri = Get-URI "https" ${Destination}
-                $Response = Invoke-WebRequest -Uri ${Destination}
+                $Response = Invoke-WebRequest -Uri ${Uri}
                 $Status_Code = $Response.StatusCode
                 if (-not ($Status_Code.ToString() -match "2\d\d")) {
                     $Status_Description = $Response.StatusDescription
