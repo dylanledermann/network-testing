@@ -53,6 +53,8 @@ Default_Gateway=$(
     awk '{print $3}'
 )
 
+Ping_Regex='[1]?[0-9][0-9]% packet loss'
+
 # Test 1 - Gets Default Gateway using ipconfig and runs a ping test
 function Test-Network-Access-Layer{
     if ! [["${Default_Gateway}"]]; then
@@ -70,7 +72,7 @@ function Test-Network-Access-Layer{
 
     # Test ping on Default Gateway
     Ping_Output=$(ping -c 10 "${Default_Gateway}")
-    if [[ "${Ping_Output}" =~  "[1]?[0-9][0-9]% packet loss" ]]; then
+    if [[ "${Ping_Output}" =~  ${Ping_Regex} ]]; then
         echo "Error in Network Access Layer: Default Gateway ping failed.">&2
         exit 1
     fi
@@ -89,7 +91,7 @@ function Test-Network-Layer{
 
     # Test `ping` on destination
     Ping_Output=$(ping -c 10 "${Destination}")
-    if [[ "${Ping_Output}" =~  "[1]?[0-9][0-9]% packet loss" ]]; then
+    if [[ "${Ping_Output}" =~  ${Ping_Regex} ]]; then
         echo "Tracing Route.">&2
         traceroute "${Destination}"
         echo "Error in Network Access Layer: Default Gateway ping failed.">&2
@@ -97,7 +99,7 @@ function Test-Network-Layer{
     fi
 
     # Test Large Packets
-    Large_Ping_Output=$(ping -D -s 1472 -c 4 "${Destination}")
+    Large_Ping_Output=$(ping -D -s 1472 -c 10 "${Destination}")
     if [[ "${Large_Ping_Output}" =~  "[1]?[0-9][0-9]% packet loss" ]]; then
         echo "Tracing Route.">&2
         traceroute "${Destination}"
