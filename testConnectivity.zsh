@@ -49,9 +49,8 @@ function Is_IP() {
 # Set Default Gateway or null if not found
 Default_Gateway=$(  
     ip route show default |
-    grep -oE "((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])" |
-    head -1
-
+    grep 'default' |
+    awk '{print $3}'
 )
 
 # Test 1 - Gets Default Gateway using ipconfig and runs a ping test
