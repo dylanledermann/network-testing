@@ -26,7 +26,7 @@ function Validate_Args() {
         echo "Invalid Argument: Port range is 0-65535.">&2
         exit 1
     elif ! [[ ${Protocol} =~ "^(HTTP|HTTPS|TSL|SSL|DNS|SSH)$" ]]; then
-        echo "Invalid Argument: Protocol must be HTTP, HTTPS, TSL, SSL, DNS, or SSH"
+        echo "Invalid Argument: Protocol must be HTTP, HTTPS, TSL, SSL, DNS, or SSH.">&2
         exit 1
     fi
 }
@@ -57,7 +57,7 @@ Default_Gateway=$(
 # Test 1 - Gets Default Gateway using ipconfig and runs a ping test
 function Test-Network-Access-Layer{
     if ! [["${Default_Gateway}"]]; then
-        echo "Error in Network Access Layer: No Default Gateway found."
+        echo "Error in Network Access Layer: No Default Gateway found.">&2
         exit 1
     fi
 
@@ -65,14 +65,14 @@ function Test-Network-Access-Layer{
     Arp_Output=$(arp -a | grep -E "${Default_Gateway}")
     if ! [[ "${Arp_Output}" =~ "([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}" ]] || 
         [[ "${Arp_Output:l}" =~ "ff:ff:ff:ff:ff:ff" ]]; then
-        echo "Error in Network Access Layer: Invalid/Missing Default Gateway MAC Address in ARP table."
+        echo "Error in Network Access Layer: Invalid/Missing Default Gateway MAC Address in ARP table.">&2
         exit 1
     fi
 
     # Test ping on Default Gateway
     Ping_Output=$(ping -c 10 "${Default_Gateway}")
     if [[ "${Ping_Output}" =~  "[1]?[0-9][0-9]% packet loss" ]]; then
-        echo "Error in Network Access Layer: Default Gateway ping failed."
+        echo "Error in Network Access Layer: Default Gateway ping failed.">&2
         exit 1
     fi
     echo "Network Access Layer Test Successful."
@@ -83,7 +83,7 @@ function Test-Network-Layer{
     # Check route list - Make sure default route is the Default Gateway (0.0.0.0/0 matches all)
     Route_Table=$(route | grep default)
     if ! [[ "${Route_Table}" =~ "${Default_Gateway}" ]]; then
-        echo "Error in Network Layer: Default Gateway not Default Route."
+        echo "Error in Network Layer: Default Gateway not Default Route.">&2
         exit 1
     fi
 
@@ -91,18 +91,18 @@ function Test-Network-Layer{
     # Test `ping` on destination
     Ping_Output=$(ping -c 10 "${Destination}")
     if [[ "${Ping_Output}" =~  "[1]?[0-9][0-9]% packet loss" ]]; then
-        echo "Tracing Route."
+        echo "Tracing Route.">&2
         traceroute "${Destination}"
-        echo "Error in Network Access Layer: Default Gateway ping failed."
+        echo "Error in Network Access Layer: Default Gateway ping failed.">&2
         exit 1
     fi
 
     # Test Large Packets
     Large_Ping_Output=$(ping -D -s 1472 -c 4 "${Destination}")
     if [[ "${Large_Ping_Output}" =~  "[1]?[0-9][0-9]% packet loss" ]]; then
-        echo "Tracing Route."
+        echo "Tracing Route.">&2
         traceroute "${Destination}"
-        echo "Warning in Network Layer: Large file message failed."
+        echo "Warning in Network Layer: Large file message failed.">&2
         return
     fi
     echo "Network Layer Test Successful."
@@ -114,7 +114,7 @@ function Test-Transport-Layer{
     Netcat_Output=$(nc -zv -w 5 "${Destination}" "${Port}" 2>&1)
     if ! [[ "${Netcat_Output}" =~ 'Connection to .* succeeded!' ]] &&
         ! [[ "${Netcat_Output}" =~ ' open$' ]]; then
-        echo "Error in Transport Layer: Connection test failed."
+        echo "Error in Transport Layer: Connection test failed.">&2
         exit 1
     fi
     echo "Transport Layer Test Successful."
@@ -122,7 +122,7 @@ function Test-Transport-Layer{
 
 function Get-URI {
     if [[ $# -ne 2 ]]; then
-        echo "Function 'Get-URI' requires 2 argument - Prefix and Address."
+        echo "Function 'Get-URI' requires 2 argument - Prefix and Address.">&2
         exit 1
     fi
     local Prefix=$1
@@ -142,7 +142,7 @@ function Test-Application-Layer{
                 Uri=$(Get-URI "http" "${Destination}")
                 Response=$(curl -v "${Uri}")
                 if ! [[ "${Response}" =~ "Connected to ${Destination}" ]]; then
-                    echo "Error in Application Layer: Web Request Failed."
+                    echo "Error in Application Layer: Web Request Failed.">&2
                     exit 1
                 fi
             ;;
@@ -150,7 +150,7 @@ function Test-Application-Layer{
                 Uri=$(Get-URI "https" "${Destination}")
                 Response=$(curl -v "${Uri}")
                 if ! [[ "${Response}" =~ "Connected to ${Destination}" ]]; then
-                    echo "Error in Application Layer: Web Request Failed."
+                    echo "Error in Application Layer: Web Request Failed.">&2
                     exit 1
                 fi
             ;;
@@ -166,7 +166,7 @@ function Test-Application-Layer{
         esac
     } always {
         if catch *; then
-            echo "Error in Application Layer: $CAUGHT"
+            echo "Error in Application Layer: $CAUGHT">&2
             exit 1
         fi
     }
