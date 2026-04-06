@@ -156,14 +156,28 @@ function Test-Application-Layer{
                 fi
             ;;
             "TLS"|"SSL")
-                openssl s_client -connect ${Destination}:$Port
+                echo "Q" | timeout 5s openssl s_client -connect ${Destination}:${Port} 2>&1
+                local Response=$?
+                if ! [ "${Response}" -eq 0 ]; then
+                    echo "openssl error: ${Response}"
+                    exit 1
+                fi
             ;;
             "DNS")
                 nslookup ${Destination}
+                local Response=$?
+                if ! [ "${Response}" -eq 0 ]; then
+                    echo "nslookup error: ${Response}"
+                    exit 1
+                fi
             ;;
             "SSH")
-                ssh -v ${Destination}
-            ;;
+                ssh -v -o ConnectTimeout=5 ${Destination}
+                local Response=$?
+                if ! [ "${Response}" -eq 0 ]; then
+                    echo "ssh error: ${Response}"
+                    exit 1
+                fi
         esac
     } always {
         if catch *; then
