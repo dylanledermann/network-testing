@@ -128,10 +128,10 @@ function Get-URI {
     fi
     local Prefix=$1
     local Address=$2
-    if (( Is_IP ${Address} )); then
-        return ${Address}
+    if (( $(Is_IP ${Address}) )); then
+        echo ${Address}
     fi
-    return "${Prefix}://${Destination}"
+    echo "${Prefix}://${Destination}"
 }
 
 # Test 4 - Test specific app protocol
