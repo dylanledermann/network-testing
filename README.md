@@ -3,6 +3,7 @@
 This repo is used to store different network tests to determine where conection problems occur.
 
 ## Table of Contents
+ - [Usage](#usage)
  - [Testing Connectivity](#testing-connectivity)
  - [General Info](#general-info)
  - [1. Physical Layer](#layer-1-physical-layer)
@@ -12,6 +13,24 @@ This repo is used to store different network tests to determine where conection 
  - [5. Session Layer](#layer-5-session-layer)
  - [6. Presentation Layer](#layer-6-presentation-layer)
  - [7. Application Layer](#layer-7-application-layer)
+
+## Usage
+Allowed Protocols are "HTTP", "HTTPS", "TSL", "SSL", "DNS", "SSH".
+Default values are Destination - 'google.com', Port - 443, Protocol - "HTTPS". 
+
+***Port is only used for SSL/TLS tests.***
+### Windows
+```powershell
+./testConnectivity.ps1 -Destination {Destination} -Port {Port} -Protocol {Protocol}
+``` 
+### Mac
+```zsh
+./testConnectivity.zsh -Destination {Destination} -Port {Port} -Protocol {Protocol}
+```
+### Linux
+```bash
+./testConnectivity.sh -d {Destination} -p {Port} -a {Protocol}
+```
 
 ## Testing Connectivity
 This guide follows TCP/IP model, since that is the actual model used.
