@@ -30,7 +30,7 @@ while getopts ":d:p:a:" opt; do
 done
 
 Validate_Args () {
-    Protocol_Regex='^(HTTP|HTTPS|TSL|SSL|DNS|SSH)$'
+    Protocol_Regex='^(HTTP|HTTPS|TLS|SSL|DNS|SSH)$'
     if [ ${Port} -lt 0 ] || [ ${Port} -gt 65535 ]; then
         echo "Invalid Argument (${Port}): Port range is 0-65535.">&2
         exit 1

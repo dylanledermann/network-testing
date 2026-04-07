@@ -19,7 +19,7 @@ param (
     [string]$Destination="google.com",
     [ValidateRange(0, 65535)]
     [int]$Port=443,
-    [ValidateSet("HTTP", "HTTPS", "TSL", "SSL", "DNS", "SSH")]
+    [ValidateSet("HTTP", "HTTPS", "TLS", "SSL", "DNS", "SSH")]
     [string]$Protocol="HTTPS"
 )
 
