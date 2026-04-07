@@ -1,4 +1,4 @@
-!/usr/bin/env zsh
+#!/usr/bin/env zsh
 # This application goes through each TCP/IP model layer to discover the breakpoint
 # 1. Test Network Access Layer
 #     a. Check default gateway exists.
@@ -16,16 +16,18 @@
 #     b. Run corresponding application to destination to test whether it is accessible.
 
 # Get args and make sure user inputs are validated
-zparseopts -D -A opts -- -Destination -Port -Protocol
-Destination=${opts[-Destination]:-"google.com"}
-Port=${opts[-Port]:-443}
-Protocol=${opts[-Protocol]:-"HTTPS"}
+typeset -A opts
+zparseopts -D -A opts -- -Destination:: -Port:: -Protocol::
+
+Destination=${opts[--Destination]:-"google.com"}
+Port=${opts[--Port]:-443}
+Protocol=${opts[--Protocol]:-"HTTPS"}
 
 function Validate_Args() {
-    if ((${Port} -lt 0)) || ((${Port} -gt 65535)); then
+    if [ ${Port} -lt 0 ] || [ ${Port} -gt 65535 ]; then
         echo "Invalid Argument: Port range is 0-65535.">&2
         exit 1
-    elif ! [[ ${Protocol} =~ "^(HTTP|HTTPS|TSL|SSL|DNS|SSH)$" ]]; then
+    elif ! [[ ${Protocol} =~ "^(HTTP|HTTPS|TLS|SSL|DNS|SSH)$" ]]; then
         echo "Invalid Argument: Protocol must be HTTP, HTTPS, TSL, SSL, DNS, or SSH.">&2
         exit 1
     fi
@@ -48,17 +50,18 @@ function Is_IP() {
 
 # Set Default Gateway or null if not found
 Default_Gateway=$(  
-    ip route show default |
-    grep 'default' |
-    awk '{print $3}'
+    netstat -nr |
+    grep default |
+    head -n 1 |
+    awk '{print $2}'
 )
 
 Ping_Regex='[1]?[0-9][0-9]% packet loss'
 
 # Test 1 - Gets Default Gateway using ipconfig and runs a ping test
-function Test-Network-Access-Layer{
-    if ! [["${Default_Gateway}"]]; then
-        echo "Error in Network Access Layer: No Default Gateway found.">&2
+Test-Network-Access-Layer () {
+    if ! [[ "${Default_Gateway}" ]]; then
+        echo "Error in Network Access Layer: No Default Gateway found." >&2
         exit 1
     fi
 
@@ -80,10 +83,10 @@ function Test-Network-Access-Layer{
 }
 
 # Test 2 - Test messaging across networks
-function Test-Network-Layer{
+Test-Network-Layer () {
     # Check route list - Make sure default route is the Default Gateway (0.0.0.0/0 matches all)
-    Route_Table=$(route | grep default)
-    if ! [[ "${Route_Table}" =~ "${Default_Gateway}" ]]; then
+    netstat -nr | grep $Default_Gateway | grep -E '([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}'>&/dev/null
+    if [ $? -ne 0 ]; then
         echo "Error in Network Layer: Default Gateway not Default Route.">&2
         exit 1
     fi
@@ -110,7 +113,7 @@ function Test-Network-Layer{
 }
 
 # Test 3 - Test end-to-end TCP messaging
-function Test-Transport-Layer{
+Test-Transport-Layer () {
     # Test TCP message to destination
     Netcat_Output=$(nc -zv -w 5 "${Destination}" "${Port}" 2>&1)
     if ! [[ "${Netcat_Output}" =~ 'Connection to .* succeeded!' ]] &&
@@ -121,7 +124,7 @@ function Test-Transport-Layer{
     echo "Transport Layer Test Successful."
 }
 
-function Get-URI {
+Get-URI () {
     if [[ $# -ne 2 ]]; then
         echo "Function 'Get-URI' requires 2 argument - Prefix and Address.">&2
         exit 1
@@ -135,28 +138,30 @@ function Get-URI {
 }
 
 # Test 4 - Test specific app protocol
-function Test-Application-Layer{
+Test-Application-Layer () {
     # Test Protocol
     {
         case $Protocol in
             "HTTP")
-                Uri=$(Get-URI "http" "${Destination}")
-                Response=$(curl -v "${Uri}")
-                if ! [[ "${Response}" =~ "Connected to ${Destination}" ]]; then
-                    echo "Error in Application Layer: Web Request Failed.">&2
+                local Uri=$(Get-URI "http" "${Destination}")
+                curl -v "${Uri}" &>/dev/null
+                local Status=$?
+                if [ $? -ne 0 ]; then
+                    echo "Error in Application Layer: Web Request Failed - ${Status}.">&2
                     exit 1
                 fi
             ;;
             "HTTPS")
-                Uri=$(Get-URI "https" "${Destination}")
-                Response=$(curl -v "${Uri}")
-                if ! [[ "${Response}" =~ "Connected to ${Destination}" ]]; then
-                    echo "Error in Application Layer: Web Request Failed.">&2
+                local Uri=$(Get-URI "https" "${Destination}")
+                curl -v "${Uri}" &>/dev/null
+                local Status=$?
+                if [ $? -ne 0 ]; then
+                    echo "Error in Application Layer: Web Request Failed - ${Status}.">&2
                     exit 1
                 fi
             ;;
             "TLS"|"SSL")
-                echo "Q" | timeout 5s openssl s_client -connect ${Destination}:${Port} 2>&1
+                echo "Q" | openssl s_client -connect ${Destination}:${Port} 2>&1
                 local Response=$?
                 if ! [ "${Response}" -eq 0 ]; then
                     echo "openssl error: ${Response}"
@@ -179,7 +184,7 @@ function Test-Application-Layer{
                     exit 1
                 fi
         esac
-    } always {
+    } || {
         if catch *; then
             echo "Error in Application Layer: $CAUGHT">&2
             exit 1

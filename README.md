@@ -25,7 +25,7 @@ Default values are Destination - 'google.com', Port - 443, Protocol - "HTTPS".
 ``` 
 ### Mac
 ```zsh
-./testConnectivity.zsh -Destination {Destination} -Port {Port} -Protocol {Protocol}
+./testConnectivity.zsh --Destination {Destination} --Port {Port} --Protocol {Protocol}
 ```
 ### Linux
 ```bash
